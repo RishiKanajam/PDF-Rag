@@ -72,6 +72,9 @@ class VectorStore:
             doc_id = _make_id(doc.page_content)
 
             metadata = {k: str(v) for k, v in doc.metadata.items()}
+            # Normalize source to filename only so paths don't differ across environments
+            if "source" in metadata:
+                metadata["source"] = os.path.basename(metadata["source"])
             metadata["content_length"] = str(len(doc.page_content))
 
             ids.append(doc_id)
