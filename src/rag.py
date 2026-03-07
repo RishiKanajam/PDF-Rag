@@ -41,7 +41,9 @@ from .vectorstore import VectorStore
 
 _ANSWER_TEMPLATE = """\
 You are a helpful assistant. Answer the question using ONLY the context below.
-If the answer is not in the context, say "I don't have enough information to answer that."
+- If asked to summarize or give an overview, summarize all the provided context thoroughly.
+- If the answer is genuinely not present in the context, say "I don't have enough information to answer that."
+- Do not refuse to answer just because the question uses casual phrasing like "uploaded file" or "this document" — treat those as referring to the context provided.
 {history_block}
 Context from documents:
 {context}
