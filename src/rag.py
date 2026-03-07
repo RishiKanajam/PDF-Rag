@@ -175,6 +175,34 @@ class RAGPipeline:
 
     # ── Public API ─────────────────────────────────────────────────────────────
 
+    def delete_source(self, source_name: str):
+        """
+        Remove all vectors for a given source file, then rebuild BM25 from what remains.
+        Also deletes the file from disk.
+        """
+        import shutil
+        # Remove from disk
+        for directory in (config.PDF_DIR, config.TEXT_DIR):
+            candidate = directory / source_name
+            if candidate.exists():
+                candidate.unlink()
+                break
+
+        # Remove from ChromaDB
+        deleted = self.vector_store.delete_by_source(source_name)
+
+        # Rebuild BM25 from remaining vectors
+        remaining = self.vector_store.get_all_documents()
+        if remaining:
+            self.bm25.build(remaining)
+            self.bm25.save()
+        else:
+            # Nothing left — remove BM25 file too
+            if config.BM25_INDEX_PATH.exists():
+                config.BM25_INDEX_PATH.unlink()
+
+        return deleted
+
     def query(self, question: str, top_k: int = config.FINAL_TOP_K) -> Dict[str, Any]:
         """
         Single-turn question answering (no memory).

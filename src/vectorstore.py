@@ -115,5 +115,23 @@ class VectorStore:
             docs.append({"id": doc_id, "document": text, "metadata": metadata})
         return docs
 
+    def delete_by_source(self, source_name: str):
+        """Delete all vectors whose metadata 'source' matches the given filename."""
+        results = self.collection.get(where={"source": source_name}, include=[])
+        ids = results["ids"]
+        if ids:
+            self.collection.delete(ids=ids)
+            print(f"[vectorstore] Deleted {len(ids)} vectors for source '{source_name}'")
+        return len(ids)
+
+    def clear_all(self):
+        """Delete every vector in the collection."""
+        self.client.delete_collection(self.collection_name)
+        self.collection = self.client.get_or_create_collection(
+            name=self.collection_name,
+            metadata={"description": "Vector DB for RAG documents"},
+        )
+        print("[vectorstore] Collection cleared.")
+
     def is_empty(self) -> bool:
         return self.collection.count() == 0

@@ -118,10 +118,9 @@ with st.sidebar:
     st.subheader("Index Controls")
 
     if st.button("🔄 Rebuild Index", use_container_width=True):
-        # Clear the cached pipeline so load_pipeline() runs again with force=True
-        load_pipeline.clear()
         with st.spinner("Rebuilding index..."):
             pipeline = load_pipeline()
+            pipeline.build(force=True)
         st.success("Index rebuilt successfully.")
         st.rerun()
 
@@ -136,16 +135,21 @@ with st.sidebar:
         col1.metric("Vectors", vec_count)
         col2.metric("Turns", f"{turn_count}/{config.MEMORY_MAX_TURNS}")
 
-        # List indexed PDFs
+        # List indexed documents with delete buttons
         pdf_files = list(config.PDF_DIR.glob("*.pdf"))
         txt_files = list(config.TEXT_DIR.glob("*.txt"))
         if pdf_files or txt_files:
             st.divider()
             st.subheader("Indexed Documents")
-            for f in pdf_files:
-                st.markdown(f"📄 {f.name}")
-            for f in txt_files:
-                st.markdown(f"📝 {f.name}")
+            for f in pdf_files + txt_files:
+                icon = "📄" if f.suffix == ".pdf" else "📝"
+                col_name, col_btn = st.columns([4, 1])
+                col_name.markdown(f"{icon} {f.name}")
+                if col_btn.button("🗑", key=f"del_{f.name}", help=f"Remove {f.name}"):
+                    with st.spinner(f"Removing {f.name}..."):
+                        pipeline.delete_source(f.name)
+                    st.success(f"Removed **{f.name}**.")
+                    st.rerun()
     except Exception:
         pass
 
