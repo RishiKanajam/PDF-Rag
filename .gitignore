@@ -1,0 +1,19 @@
+# Environment & secrets
+.env
+
+# Generated data (rebuild with: python main.py --rebuild)
+Data/vector_store/
+Data/bm25_index.pkl
+Data/eval_results.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store

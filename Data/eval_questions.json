@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "question": "What is Neural Mesh Flow and what problem does it solve?",
+    "topic": "NMF overview",
+    "source_hint": "pdf1.pdf"
+  },
+  {
+    "id": 2,
+    "question": "What are the four conditions required for a mesh to be manifold?",
+    "topic": "Manifoldness conditions",
+    "source_hint": "pdf1.pdf"
+  },
+  {
+    "id": 3,
+    "question": "How does Neural Mesh Flow compare to AtlasNet in terms of manifoldness?",
+    "topic": "NMF vs AtlasNet comparison",
+    "source_hint": "pdf1.pdf"
+  },
+  {
+    "id": 4,
+    "question": "What is the Chamfer distance and why is it insufficient for mesh generation?",
+    "topic": "Chamfer distance limitations",
+    "source_hint": "pdf1.pdf"
+  },
+  {
+    "id": 5,
+    "question": "What is the difference between semantic segmentation and instance segmentation?",
+    "topic": "Segmentation types",
+    "source_hint": "segmentation.txt"
+  },
+  {
+    "id": 6,
+    "question": "What is panoptic segmentation and why was it introduced?",
+    "topic": "Panoptic segmentation",
+    "source_hint": "segmentation.txt"
+  },
+  {
+    "id": 7,
+    "question": "What are the limitations of using a template mesh for 3D shape generation?",
+    "topic": "Template mesh limitations",
+    "source_hint": "pdf2.pdf"
+  },
+  {
+    "id": 8,
+    "question": "What is the sliding window approach for semantic segmentation and what are its disadvantages?",
+    "topic": "Sliding window segmentation",
+    "source_hint": "segmentation.txt"
+  }
+]

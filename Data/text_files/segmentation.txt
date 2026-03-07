@@ -1,0 +1,206 @@
+The image above shows the outer surface (red), the surface between compact bone and spongy bone (green), and the surface of the bone marrow (blue).
+Image segmentation can take many forms. It doesn't necessarily have to have anything to do with object boundaries. However, in general, there are three groups of image segmentation tasks:
+
+Semantic segmentation
+Instance segmentation
+Panoptic segmentation
+What is semantic segmentation?
+Semantic segmentation is simply the task of assigning a class label to every single pixel of an input image. The following image presents differences between various computer vision tasks.
+
+what is semantic segmentation
+Image Source
+The defining feature of semantic segmentation that differentiates it from instance segmentation is that it does not distinguish between different objects that belong to the same class.
+
+semantic segmentation vs instance segmentation
+Image Source
+In the image above, instead of having two different "cow" instances, we get sort of a blob of pixels that belong to the class "cow."
+
+Instance segmentation
+Instance segmentation is very similar to semantic segmentation. The only difference is that it distinguishes between different objects of the same class.
+
+instance segmentation
+Image Source
+Panoptic segmentation
+While semantic segmentation tells us the class label of every pixel in the image, instance segmentation differentiates between different objects of the same class.
+However, neither of them provides a complete understanding of the image. Semantic segmentation is suited to labeling uncountable objects such as "sky" or "ocean" or just objects we're only interested in, clusters like "leaves" or grass. Instance segmentation is well-suited for understanding countable objects.
+All the objects of an image can be classified this way into "countable" or "uncountable classes". To address both types, panoptic segmentation comes to help. It basically combines both tasks into one.
+
+panoptic segmentation
+Training convolutional neural networks for semantic segmentation: The naive approach
+Since, broadly speaking, our problem-at-hand classification task is just like simple image classification, it would make sense to try and apply techniques that work for image classification to the task at hand.
+
+The first naive idea that comes to mind is to use a sliding window approach. We can imagine a sliding window of some dimensions (3x3 or 7x7) and for each window, we can try to classify the center pixel.
+
+semantic segmentation idea sliding window
+This kind of approach can potentially work. However, it has several glaring disadvantages.
+
+It is very inefficient as it does not reuse features that are shared between patches.
+It does not use spatial information effectively, and different sliding window sizes may lead to different accuracy performances based on the domain that the image is from. A smaller window will lose the broad picture, while larger ones will fail to capture fine details.
+Fully convolutional networks
+The next idea that comes to mind is to use fully convolutional networks and try to make the predictions for all pixels. This way, we address both of the disadvantages that the naive method had.
+
+semantic segmentation idea fully convolutional
+Now we have a fully convolutional neural network, and in the last layer, we have a feature map of size C x H x W where C is the number of classes. All that remains at the end is to take the maximum number in each column along that dimension as the resulting class for the pixel.
+
+To visualize, imagine the k-th slice of the output layer as a matrix of the same width and height as the input image where (i,j)-th pixel represents the probability of that pixel belonging to the k-th class of our dataset.
+
+fully convolutional neural network
+You can think of the last layer of the convnet to look like this.
+While convolutional neural networks of this type will perform far better and be faster than the naive approach, they will still have performance issues. If the training data consists of images that have high-resolution convolutions, in this original resolution of the input image along every hidden layer will be computationally expensive.
+
+Fully convolutional networks in up-sampling and down-sampling
+To combat this issue of performance we can think about using various pooling layers to down-sample and up-sample the input image.
+
+fully convolutional networks in up sampling and down sampling
+This way we will have drastically reduced the number of parameters and operations needed to train our neural network. To perform these up and down-sampling operations we will use pooling layers.
+
+Pooling operations
+Down-sampling can be done using any of the standard pooling operations, such as max-pooling or average pooling. The case of up-sampling is a bit more difficult. Once the dimensions of the input image are reduced, we have invariably lost some information about it.
+Several up-sampling or "unpooling" methods have been used to address this issue. These include:
+
+Bed of nails unpooling
+Nearest neighbor unpooling
+"Max" unpooling
+Learnable upsampling methods
+Bed of nails
+The simplest approach is called "Bed of nails." To understand this method imagine that we are traversing over the downsampled image, and for each pixel value, we recreate an x by x square where the top-left corner equals the current pixel value and the rest are zeroes.
+
+bed of nails
+This method is computationally very fast and retains information learned by down-sampling, but it produces low-quality up-sampled images.
+
+Nearest neighbor
+Another computationally simple interpolation method in image processing is called "nearest neighbor interpolation." Imagine simply copying each value in the given image into a square of a given kernel size.
+
+nearest neighbor
+The artifacts produced by this method are pixelated images.
+
+Max unpooling
+The methods described above do not take into consideration the position of the element was chosen by the max-pooling layer which was responsible for the down-sampling of the image. This resulted in further inaccuracies when up-sampling. To battle this issue and still have a computationally feasible up-sampling, max-unpooling layers were introduced.
+
+Using this method, we remember the local indices of the maximum elements inside our kernel and the mappings between corresponding pairs of pooling and un-pooling layers. We complete the un-pooling using the same method as described in the "Bed of nails" method, except instead of putting the value in the top-left corner, we put it in the index that we memorized.
+
+max unpooling
+‍
+
+Learnable unpooling methods
+Methods described above are not learnable and inevitably produce up-sampled images with a lot of artifacts that will vary in significance depending on the domain. They may also result in bad representations of the exact boundary between all the objects of the image.
+
+learnable unpooling methods
+‍
+
+Designing a loss function
+The loss function for the classification task is the "cross-entropy" loss, defined as follows:
+
+designing a loss function
+Image Source
+Given the way we have defined our final layer of the convolutional network, the most natural loss function would be to apply this cross-entropy loss on a pixel level. This is in fact, the most widely used loss function for semantic segmentation.
+
+Popular CNN-based semantic segmentation models
+‍
+After the huge success of the deep convolutional neural networks in the “ImageNet” challenge, the computer vision community gradually found applications for them on more sophisticated tasks, such as object detection, semantic segmentation, keypoint detection, panoptic segmentation, etc.
+
+The evolution of the semantic segmentation networks started from a small modification of the state-of-the-art (SOTA) models for classification. The usual fully connected layers at the end of these networks were substituted with 1x1 convolutional layers, and as a last layer, a transposed convolution was added (interpolation followed by a convolution) to project back to the original input size. These simplest fully convolutional networks (FCNs) were the first successful semantic segmentation networks. The next major evolution step made by U-Net was the introduction of the encoder-decoder architectures that also employed residual connections, which resulted in more fine-grained and crisp segmentation maps. These major architectural proposals were also followed by various smaller improvements that resulted in a vast number of architectures, each having its own pros and cons.
+
+Besides these founding architecture changes, there are some enhancements on them that are also worth mentioning.
+
+Hybrid CNN-CRF methods (DeepLab)
+The initial DeepLab version brings some improvements to the existing encoder-decoder architectures to make the boundaries of the segmentation masks crisper. Besides the CRF, it makes use of dilated convolutions which counters reduced feature resolution. Using dilated convolutions, the same receptive field can be achieved in shallower layers, making it possible to exclude some of the poolings. Next, as commonly used in object detectors, DeepLab also utilizes pyramid pooling to handle the problem of having objects at different scales. And finally, the CRF is used separately from the neural network part to improve the localization of edges. The main drawback of this approach is that there is no end-to-end training.
+
+FastFCN
+Following the success of DeepLab, FastFCN addresses the speed of the DeepLab model, which was affected by the dilated convolutions and the CRF. FastFCN overcomes the limitations of speed caused by the usage of dilated convolutions. As mentioned before, DeepLab increases the receptive field in the shallower layers and gets rid of stridden convolutions in the last blocks of ResNet. This results in an increase in spatial dimensions of the feature map, therefore becoming a significant speed bottleneck. FastFCN successfully addresses this issue by approximating the outputs of these blocks with its Joint Pyramid Upsampling blocks.
+
+DeepLabV3
+DeepLabv3 addresses its own speed limitations while also significantly improving the IoU score. The main drawback that the previous model had was the CRF, which made it pretty slow and also was trained separately from the neural network, and which also could make it score-wise suboptimal. To address these issues, the CRF block was completely removed, and the problem of the poor localization of edges was solved by combining the dilated convolutions and spatial pyramid pooling. This solves all three problems that DeepLab addressed separately. To boost up the speed even further, DeepLabv3 also used depthwise separable convolutions instead of the usual ones that perform significantly fewer operations.
+
+Newer vision transformer-based models
+The above described fully convolutional networks (that use encoder-decoder architectures where the encoder generates low-resolution image features and the decoder up-samples and creates a final feature map to segmentation maps with per-pixel class scores) had become the the dominant approach for semantic segmentation. However, there are several downsides to this approach.
+
+The local nature of convolutional networks inherently limits the global image features that may be necessary for solving the semantic segmentation task in particular domains.
+
+Another drawback of a fully convolutional network is that when the number of class labels increases, the final layer and, therefore, the loss function can become very large. However, with vision transformers, this effect is mitigated.
+
+With the invention of vision transformers and their high performance on other tasks, transformer-based segmentation models have also been investigated.
+Several architectures, such as Segmenter: Transformer for Semantic Segmentation and Vision Transformers for Dense Prediction, have been proposed. For purposes of this article, we will discuss the former.
+
+Segmenter: The architecture
+Similar to a fully convolutional network, Segmenter is also using an encoder-decoder architecture to first extract features and then create a pixel-accurate segmentation map.
+
+By nature, attention blocks used in transformers do not suffer from local or down-sampling issues present in convolutions.
+
+However, modeling global attention comes at a quadratic cost; therefore, following the original ViT, the image is first split into patches, then flattened and fed into consecutive L transformer blocks.
+
+Then the resulting sequence of patch encodings is decoded by the Mask-Transformer into feature maps, which later are up-sampled into complete segmentation maps.
+
+segmenter
+The performance of Segmenter compared to other models
+performance of segmenter compared to other models
+Images per second and mean IoU for Segmenter compared to other methods on ADE20K validation set. Image Source
+To target the speed limitations of transformer blocks, larger or smaller patch sizes can be used; the larger the patch size, the harder it is to capture sharper object boundaries.
+
+Use cases for semantic segmentation
+Semantic segmentation has several use cases in computer vision:
+
+Computer vision-based self-driving cars
+computer vision based self driving cars
+Images taken from CityScapes Dataset.
+Understanding specific parts (objects, road signs, other cars, etc.) in the car's view is of significant importance to the final performance of the model.
+
+Background removal
+background removal
+Image Source
+Semantic segmentation is also used to outline and exclude backgrounds wherever relevant.
+
+Virtual image search
+As we discussed broadly speaking, semantic segmentation is just the task of dividing the input into image segments that share a common characteristic. By having this understanding, we can design image retrieval algorithms to also search for images similar to the given one.
+
+Agriculture
+Using images of crops, one can identify how much of it is healthy or infected. Another possibility is to try and predict the yield of a particular field.
+
+agriculture semantic segmentation
+Image Source
+Fashion industry and virtual try-on
+fashion industry and virtual try on
+Image Source
+Mapping for satellite and aerial imagery
+original satellite image
+Left: Original satellite image. Right: Semantic segmentation of roads, buildings and vegetation.
+Medical imaging and medical image segmentation
+Given x-rays or other medical images, semantic segmentation models can predict areas of interest such as tumors. Medical image analysis is of great importance as it can automate the workflow of clinicians. For example, Kvasir-SEG is an open-access dataset of gastrointestinal polyp images and corresponding segmentation masks. Models like FCB-SwinV2 Transformer for Polyp Segmentation by Kerr Fitzgerald and Bogdan Matuszewski have the potential to help improve early detection rates of polyps that may progress into cancer.
+
+medical image segmentation
+Left: CXR from Japanese Society of Radiology Technology. Right: The same CXR overlaid with human labeled left lung, right lung, and heart contours.
+Overall, semantic segmentation is used for more complex tasks in contrast to other image annotation alternatives, as machines get to develop higher-level judgment.
+
+Annotating images for semantic segmentation
+‍
+Deep learning models usually require large numbers of input images to be trained on. A dataset is the result of gathering and annotating images.
+
+Pixel-accurate annotations are required for semantic segmentation, and creating them is a tedious and expensive project. A lot of the time, it makes sense to leverage an already existing segmentation model to pre-annotate images and use manual labor to correct the wrong and fill in the missing predictions of the model.
+
+Other than completely relying on predictions made by models, it makes sense to run edge detection and other image segmentation models to pre-segment the image and auto-fill them with the correct class label by hand.
+
+SuperAnnotate provides several editors: the Pixel and Vector editors are well suited for annotating images for the semantic segmentation task.
+
+annotating for semantic segmentation
+Using these, you can not only conveniently annotate data, but also run an image segmentation model for edge detection, or even fine-tune DeepLabV3 for your custom dataset and use it to speed up annotations.
+
+One-shot annotation
+Traditionally, manually segmenting images for tasks like semantic segmentation is a slow process that often requires labeling each pixel by hand. SuperAnnotate's one-shot annotation changes this by letting you label just one instance of an object or class. The tool then automatically finds and labels similar objects throughout your images.
+
+How one-shot annotation works in SuperAnnotate
+One-shot annotate: Begin with an unlabeled dataset. For instance, if you want to label horses, just click on an image with a horse and then click "Annotate similar."
+Find similar: The tool's core model scans and identifies parts of images with horses that look like the one you selected.
+Assign label: Check the model’s suggestions and confirm the correct ones to include these labels in your dataset.
+You can repeat this process for different objects by selecting them and clicking "Annotate similar." Each time you use the tool, it gets better at recognizing and labeling similar items. This ongoing improvement, fueled by your feedback, makes the annotation quicker, improves the quality of your data, and leads to more accurate segmentation models.
+
+Image segmentation datasets
+To create better and more reliable machine learning models, they need to be introduced to decent quantities of training data. It's not always realistic, feasible, or cost-effective to annotate hundreds or thousands of images by yourself or with a team. Besides, the odds are you will have to go back and retrain the model if its performance does not suffice your project requirements. In that case, you may need an extra amount of training and testing data, and this is where open-source datasets will step in, including the COCO dataset, PascalVOC, The Cityscapes, BDD100K, and ADE20K.
+
+Image segmentation frameworks
+For the purposes of this article, we also jotted down a list of frameworks you can use to level up your computer vision project:
+‍
+
+Detectron2
+Developed by Meta, Detectron2 is a very well-built library that provides state-of-the-art detection and segmentation algorithms. Aside from providing easy predictions and fine-tuning code for SOTA methods, it is written in a way that allows users to build their own backbones and architectures and data loaders that would be suitable for your custom research project.
+PaddlePaddle/PaddleSeg
+Similar to Detectron2, PaddleSeg is an end-to-end high-efficent development toolkit for image segmentation based on PaddlePaddle, which helps both developers and researchers in the whole process of designing segmentation and training models, optimizing performance and inference speed, and deploying models.
