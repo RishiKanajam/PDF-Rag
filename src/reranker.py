@@ -28,9 +28,13 @@ import config
 
 
 class Reranker:
-    def __init__(self, model_name: str = config.RERANKER_MODEL):
-        print(f"[reranker] Loading cross-encoder: {model_name}")
-        self.model = CrossEncoder(model_name)
+    def __init__(
+        self,
+        model_name: str = config.RERANKER_MODEL,
+        revision: str = config.RERANKER_MODEL_REVISION,
+    ):
+        print(f"[reranker] Loading cross-encoder: {model_name}@{revision[:7]}")
+        self.model = CrossEncoder(model_name, revision=revision)
         print("[reranker] Ready")
 
     def rerank(

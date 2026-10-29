@@ -36,8 +36,10 @@ from .reranker import Reranker
 from .vectorstore import VectorStore
 import config
 
+RETRIEVAL_MODES = ("dense", "bm25", "hybrid", "hybrid_rerank")
 
-def _reciprocal_rank_fusion(
+
+def reciprocal_rank_fusion(
     *result_lists: List[Dict[str, Any]],
     k: int = config.RRF_K,
 ) -> List[Dict[str, Any]]:
@@ -84,32 +86,13 @@ class RAGRetriever:
         self.bm25 = bm25_index
         self.reranker = reranker
 
-    def retrieve(
-        self,
-        query: str,
-        top_k: int = config.FINAL_TOP_K,
-        hybrid_k: int = config.HYBRID_TOP_K,
-    ) -> List[Dict[str, Any]]:
-        """
-        Full hybrid retrieval pipeline for a single query.
-
-        Steps:
-            1. Embed the query → semantic search in ChromaDB (top hybrid_k)
-            2. BM25 keyword search (top hybrid_k)
-            3. RRF merge both result lists
-            4. Cross-encoder rerank merged list → return top_k
-
-        Returns:
-            List of chunk dicts with keys:
-                id, document, metadata, score, rrf_score, rerank_score
-        """
-        # ── 1. Semantic search ─────────────────────────────────────────────────
+    def _semantic_search(self, query: str, top_k: int) -> List[Dict[str, Any]]:
         query_embedding = self.embedder.embed([query])[0]
         raw = self.vector_store.query(
-            query_embedding=query_embedding.tolist(), top_k=hybrid_k
+            query_embedding=query_embedding.tolist(), top_k=top_k
         )
 
-        semantic_results = []
+        results = []
         if raw["documents"] and raw["documents"][0]:
             for doc_id, doc, metadata, distance in zip(
                 raw["ids"][0],
@@ -117,7 +100,7 @@ class RAGRetriever:
                 raw["metadatas"][0],
                 raw["distances"][0],
             ):
-                semantic_results.append(
+                results.append(
                     {
                         "id": doc_id,
                         "document": doc,
@@ -125,12 +108,47 @@ class RAGRetriever:
                         "score": round(1 - distance, 4),
                     }
                 )
+        return results
+
+    def retrieve(
+        self,
+        query: str,
+        top_k: int = config.FINAL_TOP_K,
+        hybrid_k: int = config.HYBRID_TOP_K,
+        mode: str = config.RETRIEVAL_MODE,
+    ) -> List[Dict[str, Any]]:
+        """
+        Retrieval pipeline for a single query. `mode` picks which stages run:
+
+            dense          1. semantic search (top hybrid_k)
+            bm25           2. BM25 keyword search (top hybrid_k)
+            hybrid         1 + 2, then 3. RRF merge
+            hybrid_rerank  1 + 2 + 3, then 4. cross-encoder rerank
+
+        Every mode returns the best top_k of its ranked list, so the number of
+        chunks sent to the LLM is the same whichever mode is used.
+
+        Returns:
+            List of chunk dicts with keys:
+                id, document, metadata, score (+ rrf_score, rerank_score)
+        """
+        if mode not in RETRIEVAL_MODES:
+            raise ValueError(f"Unknown retrieval mode '{mode}'. Use one of {RETRIEVAL_MODES}.")
+
+        # ── 1. Semantic search ─────────────────────────────────────────────────
+        semantic_results = (
+            self._semantic_search(query, hybrid_k) if mode != "bm25" else []
+        )
+        if mode == "dense":
+            return semantic_results[:top_k]
 
         # ── 2. BM25 keyword search ─────────────────────────────────────────────
         bm25_results = self.bm25.search(query, top_k=hybrid_k)
+        if mode == "bm25":
+            return bm25_results[:top_k]
 
         # ── 3. Reciprocal Rank Fusion ──────────────────────────────────────────
-        merged = _reciprocal_rank_fusion(semantic_results, bm25_results)
+        merged = reciprocal_rank_fusion(semantic_results, bm25_results)
 
         print(
             f"[retriever] '{query[:55]}' → "
@@ -138,6 +156,8 @@ class RAGRetriever:
             f"bm25={len(bm25_results)}, "
             f"merged={len(merged)}"
         )
+        if mode == "hybrid":
+            return merged[:top_k]
 
         # ── 4. Cross-encoder rerank ────────────────────────────────────────────
         final = self.reranker.rerank(query, merged, top_k=top_k)

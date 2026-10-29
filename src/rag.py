@@ -67,15 +67,20 @@ Standalone question:"""
 
 
 class RAGPipeline:
-    def __init__(self):
+    def __init__(self, vector_store=None, bm25=None, llm=None):
+        """
+        All arguments are optional; the defaults are what the app ships.
+        The evaluation passes its own vector store / BM25 index (built from
+        eval/docs) and a caching LLM wrapper.
+        """
         self.embedder     = EmbeddingManager()
-        self.vector_store = VectorStore()
-        self.bm25         = BM25Index()
+        self.vector_store = vector_store or VectorStore()
+        self.bm25         = bm25 or BM25Index()
         self.reranker     = Reranker()
         self.retriever    = RAGRetriever(
             self.vector_store, self.embedder, self.bm25, self.reranker
         )
-        self.llm = ChatGroq(
+        self.llm = llm or ChatGroq(
             api_key=config.GROQ_API_KEY,
             model_name=config.LLM_MODEL,
             temperature=config.LLM_TEMPERATURE,
@@ -142,9 +147,9 @@ class RAGPipeline:
 
     # ── Internal helpers ───────────────────────────────────────────────────────
 
-    def _retrieve_and_format(self, question: str, top_k: int):
+    def _retrieve_and_format(self, question: str, top_k: int, mode: str):
         """Run retrieval and return (chunks, context_string, sources_list)."""
-        chunks = self.retriever.retrieve(question, top_k=top_k)
+        chunks = self.retriever.retrieve(question, top_k=top_k, mode=mode)
         if not chunks:
             return [], "", []
         context = "\n\n---\n\n".join(c["document"] for c in chunks)
@@ -205,7 +210,12 @@ class RAGPipeline:
 
         return deleted
 
-    def query(self, question: str, top_k: int = config.FINAL_TOP_K) -> Dict[str, Any]:
+    def query(
+        self,
+        question: str,
+        top_k: int = config.FINAL_TOP_K,
+        mode: str = config.RETRIEVAL_MODE,
+    ) -> Dict[str, Any]:
         """
         Single-turn question answering (no memory).
 
@@ -213,17 +223,19 @@ class RAGPipeline:
             answer   – the LLM's response string
             sources  – list of {source, page, rerank_score} for traceability
             chunks   – raw retrieved chunks (for debugging)
+            usage    – token usage reported by the LLM (None if no LLM call)
         """
         if self.vector_store.is_empty():
             raise RuntimeError("Index is empty. Run build() first.")
 
-        chunks, context, sources = self._retrieve_and_format(question, top_k)
+        chunks, context, sources = self._retrieve_and_format(question, top_k, mode)
 
         if not chunks:
             return {
                 "answer":  "I couldn't find any relevant information in the documents.",
                 "sources": [],
                 "chunks":  [],
+                "usage":   None,
             }
 
         prompt = _ANSWER_TEMPLATE.format(
@@ -232,13 +244,19 @@ class RAGPipeline:
             question=question,
         )
         response = self.llm.invoke(prompt)
-        return {"answer": response.content, "sources": sources, "chunks": chunks}
+        return {
+            "answer":  response.content,
+            "sources": sources,
+            "chunks":  chunks,
+            "usage":   getattr(response, "usage_metadata", None),
+        }
 
     def chat(
         self,
         question: str,
         memory: ConversationMemory,
         top_k: int = config.FINAL_TOP_K,
+        mode: str = config.RETRIEVAL_MODE,
     ) -> Dict[str, Any]:
         """
         Multi-turn question answering with conversation memory.
@@ -265,7 +283,7 @@ class RAGPipeline:
         standalone = self._reformulate(question, memory)
 
         # Step 2: retrieve with the standalone question
-        chunks, context, sources = self._retrieve_and_format(standalone, top_k)
+        chunks, context, sources = self._retrieve_and_format(standalone, top_k, mode)
 
         if not chunks:
             answer = "I couldn't find any relevant information in the documents."

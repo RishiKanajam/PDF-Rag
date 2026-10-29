@@ -12,8 +12,17 @@ TEXT_DIR        = DATA_DIR / "text_files"
 VECTOR_STORE_DIR = DATA_DIR / "vector_store"
 BM25_INDEX_PATH  = DATA_DIR / "bm25_index.pkl"
 
-# ── Embedding ──────────────────────────────────────────────────────────────────
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+# ── Models (pinned) ──────────────────────────────────────────────────────────
+# Every model the pipeline and the evaluation use is pinned here. Hugging Face
+# models are pinned to a commit hash; Groq models are pinned by name (Groq
+# exposes no finer version, so eval results also record the system_fingerprint).
+EMBEDDING_MODEL          = "sentence-transformers/all-MiniLM-L6-v2"
+EMBEDDING_MODEL_REVISION = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
+RERANKER_MODEL           = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+RERANKER_MODEL_REVISION  = "233902d25c440f23af6f7d6e94d2946bac0bee0a"
+LLM_MODEL                = "llama-3.1-8b-instant"
+JUDGE_PROVIDER           = "groq"
+JUDGE_MODEL              = "llama-3.3-70b-versatile"
 
 # ── Chunking ───────────────────────────────────────────────────────────────────
 # strategy: "sentence" (NLTK sentence-aware, never cuts mid-sentence)
@@ -33,10 +42,11 @@ FINAL_TOP_K     = 3
 SCORE_THRESHOLD = 0.0
 # k constant for Reciprocal Rank Fusion — 60 is the standard value.
 RRF_K           = 60
-
-# ── Reranker ───────────────────────────────────────────────────────────────────
-# ~85 MB, runs locally, very accurate at scoring (query, chunk) pairs.
-RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+# "dense"         — embeddings only
+# "bm25"          — keyword only
+# "hybrid"        — BM25 + dense fused with RRF
+# "hybrid_rerank" — hybrid, then the cross-encoder reranks the fused candidates
+RETRIEVAL_MODE  = "hybrid_rerank"
 
 # ── Memory ────────────────────────────────────────────────────────────────────
 # How many past conversation turns to keep in context (1 turn = 1 Q&A pair).
@@ -45,7 +55,6 @@ MEMORY_MAX_TURNS = 5
 
 # ── LLM ───────────────────────────────────────────────────────────────────────
 GROQ_API_KEY    = os.getenv("GROQ_API_KEY")
-LLM_MODEL       = "llama-3.1-8b-instant"
 LLM_TEMPERATURE = 0.1
 LLM_MAX_TOKENS  = 1000
 
