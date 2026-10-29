@@ -20,9 +20,15 @@ EMBEDDING_MODEL          = "sentence-transformers/all-MiniLM-L6-v2"
 EMBEDDING_MODEL_REVISION = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
 RERANKER_MODEL           = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 RERANKER_MODEL_REVISION  = "233902d25c440f23af6f7d6e94d2946bac0bee0a"
-LLM_MODEL                = "llama-3.1-8b-instant"
+# llama-3.1-8b-instant / llama-3.3-70b-versatile return 404 for this account
+# (checked 2026-10-30), so both moved to Groq's production gpt-oss models.
+# These are reasoning models: reasoning tokens count against max_tokens.
+LLM_MODEL                = "openai/gpt-oss-20b"
+LLM_REASONING_EFFORT     = "low"
 JUDGE_PROVIDER           = "groq"
-JUDGE_MODEL              = "llama-3.3-70b-versatile"
+JUDGE_MODEL              = "openai/gpt-oss-120b"
+JUDGE_REASONING_EFFORT   = "medium"
+JUDGE_MAX_TOKENS         = 2000
 
 # ── Chunking ───────────────────────────────────────────────────────────────────
 # strategy: "sentence" (NLTK sentence-aware, never cuts mid-sentence)

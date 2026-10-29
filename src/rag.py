@@ -85,6 +85,7 @@ class RAGPipeline:
             model_name=config.LLM_MODEL,
             temperature=config.LLM_TEMPERATURE,
             max_tokens=config.LLM_MAX_TOKENS,
+            reasoning_effort=config.LLM_REASONING_EFFORT,
         )
 
     def build(self, force: bool = False):

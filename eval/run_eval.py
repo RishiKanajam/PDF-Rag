@@ -68,12 +68,12 @@ ABLATION        = ("hybrid_rerank", 5)
 HUMAN_CHECK_N   = 15
 MODES           = ("dense", "bm25", "hybrid", "hybrid_rerank")
 
-# Approximate cost only. Groq's model page no longer lists per-token prices
-# (checked 2026-10-30); these are Groq's last published on-demand list prices
-# in USD per million tokens. Token counts in the results are exact.
+# Groq list prices in USD per million tokens, from the per-model pages on
+# console.groq.com (checked 2026-10-30). Output tokens include reasoning
+# tokens. Cached-input discounts are ignored, so cost is an upper bound.
 PRICES_USD_PER_M = {
-    "llama-3.1-8b-instant":    {"input": 0.05, "output": 0.08},
-    "llama-3.3-70b-versatile": {"input": 0.59, "output": 0.79},
+    "openai/gpt-oss-20b":  {"input": 0.075, "output": 0.30},
+    "openai/gpt-oss-120b": {"input": 0.15,  "output": 0.60},
 }
 
 
@@ -225,11 +225,14 @@ def run_generation(pipeline, answer_llm, judge, questions, mode, k) -> List[Dict
             "answer_cost_usd": cost_usd(config.LLM_MODEL, llm.usage_metadata if llm else None),
             "answer_cached": llm.cached if llm else None,
             "answer_fingerprint": (llm.response_metadata or {}).get("system_fingerprint") if llm else None,
+            "answer_finish_reason": (llm.response_metadata or {}).get("finish_reason") if llm else None,
             "judge_usage": verdict.usage,
             "judge_cost_usd": cost_usd(judge.model, verdict.usage),
             "judge_cached": verdict.cached,
             "judge_fingerprint": ((judge.llm.last.response_metadata or {}).get("system_fingerprint")
                                   if judge.llm.last else None),
+            "judge_finish_reason": ((judge.llm.last.response_metadata or {}).get("finish_reason")
+                                    if judge.llm.last else None),
         })
         if i % 10 == 0 or i == len(questions):
             print(f"[eval] Generation {mode} k={k}: {i}/{len(questions)}")
@@ -285,6 +288,8 @@ def summarize_generation(rows) -> List[Dict[str, Any]]:
         tokens = [(r["answer_usage"] or {}).get("total_tokens", 0) for r in rs]
         out.append({
             "mode": mode, "k": k, "n": len(rs), "judge_parse_errors": len(rs) - len(ok),
+            "answers_truncated": sum(r["answer_finish_reason"] == "length" for r in rs),
+            "judge_truncated": sum(r["judge_finish_reason"] == "length" for r in rs),
             "faithfulness": _mean(r["judge_faithfulness"] for r in ok),
             "answer_relevance": _mean(r["judge_answer_relevance"] for r in ok),
             "context_relevance": _mean(r["judge_context_relevance"] for r in ans),
@@ -313,8 +318,9 @@ def write_markdown(path: Path, meta, retrieval_summary, generation_summary):
     ]
     if generation_summary:
         lines += [
-            f"- Answer LLM: `{meta['models']['answer_llm']}` (temperature {config.LLM_TEMPERATURE}); "
-            f"judge: `{meta['models']['judge']}` (temperature 0, prompt sha256 `{meta['judge_prompt_sha256'][:12]}`)",
+            f"- Answer LLM: `{meta['models']['answer_llm']}` ({meta['models']['answer_llm_settings']}); "
+            f"judge: `{meta['models']['judge']}` ({meta['models']['judge_settings']}, "
+            f"prompt sha256 `{meta['judge_prompt_sha256'][:12]}`)",
             f"- Groq system fingerprints — answer: {meta['fingerprints']['answer'] or '—'}; "
             f"judge: {meta['fingerprints']['judge'] or '—'}",
         ]
@@ -353,6 +359,8 @@ def write_markdown(path: Path, meta, retrieval_summary, generation_summary):
         lines += ["", f"## Ablation: {ABLATION[0]} at k={ABLATION[1]}", ""]
         lines += gen_table(ablation)
         errors = sum(s["judge_parse_errors"] for s in generation_summary)
+        truncated = sum(s["answers_truncated"] for s in generation_summary)
+        judge_truncated = sum(s["judge_truncated"] for s in generation_summary)
         judge_cost = sum(s["judge_cost_total_usd"] for s in generation_summary)
         lines += [
             "",
@@ -360,6 +368,7 @@ def write_markdown(path: Path, meta, retrieval_summary, generation_summary):
             "correctness, false abstention and gold-in-context over answerable questions only. "
             "Scores are on a 0 / 0.5 / 1 scale (see `eval/judge_prompt.md`). "
             f"Judge parse errors (excluded): {errors}. "
+            f"Responses cut off at max_tokens — answers: {truncated}, judge: {judge_truncated}. "
             f"Latency is retrieval + answer generation end to end; for cached answers the "
             f"original API latency is used. Cost is approximate (see `PRICES_USD_PER_M`); "
             f"total judge cost for this run ≈ ${judge_cost:.4f}.",
@@ -435,9 +444,10 @@ def main() -> int:
         answer_llm = CachedChatModel(
             ChatGroq(api_key=os.environ["GROQ_API_KEY"], model_name=config.LLM_MODEL,
                      temperature=config.LLM_TEMPERATURE, max_tokens=config.LLM_MAX_TOKENS,
-                     max_retries=6),
+                     reasoning_effort=config.LLM_REASONING_EFFORT, max_retries=6),
             model_name=f"groq/{config.LLM_MODEL}",
-            params={"temperature": config.LLM_TEMPERATURE, "max_tokens": config.LLM_MAX_TOKENS},
+            params={"temperature": config.LLM_TEMPERATURE, "max_tokens": config.LLM_MAX_TOKENS,
+                    "reasoning_effort": config.LLM_REASONING_EFFORT},
             cache_path=CACHE_DIR / "llm_cache.sqlite",
         )
         judge = make_judge(args.judge_provider, args.judge_model, CACHE_DIR)
@@ -481,7 +491,12 @@ def main() -> int:
             "embedding": f"{config.EMBEDDING_MODEL}@{config.EMBEDDING_MODEL_REVISION}",
             "reranker": f"{config.RERANKER_MODEL}@{config.RERANKER_MODEL_REVISION}",
             "answer_llm": f"groq/{config.LLM_MODEL}" if generation else None,
+            "answer_llm_settings": {"temperature": config.LLM_TEMPERATURE,
+                                    "max_tokens": config.LLM_MAX_TOKENS,
+                                    "reasoning_effort": config.LLM_REASONING_EFFORT} if generation else None,
             "judge": f"{args.judge_provider}/{args.judge_model}" if generation else None,
+            "judge_settings": {"temperature": 0, "max_tokens": config.JUDGE_MAX_TOKENS,
+                               "reasoning_effort": config.JUDGE_REASONING_EFFORT} if generation else None,
         },
         "judge_prompt_sha256": hashlib.sha256((EVAL_DIR / "judge_prompt.md").read_bytes()).hexdigest(),
         "fingerprints": {

@@ -20,6 +20,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Dict
 
+import config
 from eval.llm_cache import CachedChatModel
 
 PROMPT_PATH = Path(__file__).resolve().parent / "judge_prompt.md"
@@ -87,7 +88,8 @@ class Judge:
         self.llm = CachedChatModel(
             self._make_client(),
             model_name=f"{self.provider}/{model}",
-            params={"temperature": 0, "json": True},
+            params={"temperature": 0, "json": True, "max_tokens": config.JUDGE_MAX_TOKENS,
+                    "reasoning_effort": config.JUDGE_REASONING_EFFORT},
             cache_path=cache_dir / "llm_cache.sqlite",
         )
 
@@ -133,7 +135,8 @@ class GroqJudge(Judge):
             api_key=os.environ[self.api_key_env],
             model_name=self.model,
             temperature=0,
-            max_tokens=300,
+            max_tokens=config.JUDGE_MAX_TOKENS,
+            reasoning_effort=config.JUDGE_REASONING_EFFORT,
             max_retries=6,
             model_kwargs={"response_format": {"type": "json_object"}},
         )

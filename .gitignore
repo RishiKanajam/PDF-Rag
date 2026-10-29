@@ -1,5 +1,6 @@
 # Environment & secrets
 .env
+.env.local
 
 # Generated data (rebuild with: python main.py --rebuild)
 Data/vector_store/
