@@ -67,6 +67,19 @@ def mrr_at_k(relevant: Sequence[bool], k: int) -> float:
     return 1.0 / rank if rank else 0.0
 
 
+def cohens_kappa(a: Sequence[Any], b: Sequence[Any]) -> float:
+    """Cohen's kappa for two raters over the same items (nan if undefined)."""
+    if len(a) != len(b) or not a:
+        raise ValueError("need two equal-length, non-empty rating lists")
+    n = len(a)
+    observed = sum(x == y for x, y in zip(a, b)) / n
+    labels = set(a) | set(b)
+    expected = sum((list(a).count(l) / n) * (list(b).count(l) / n) for l in labels)
+    if expected == 1:
+        return float("nan")  # both raters used a single identical label
+    return (observed - expected) / (1 - expected)
+
+
 def percentile(values: List[float], p: float) -> float:
     """Nearest-rank percentile (p in 0..100)."""
     if not values:
