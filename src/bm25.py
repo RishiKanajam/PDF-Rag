@@ -13,11 +13,16 @@ What you learn here:
     • Together they cover each other's blind spots.
 - Persistence: BM25 doesn't have its own database, so we pickle (serialize) the
   index to disk and reload it on the next run — avoiding a full rebuild.
-- Tokenization: we lowercase and split on whitespace. Simple but effective for
-  English text. Punctuation is kept, which is fine for BM25's purposes.
+- Tokenization: lowercase, then take runs of letters/digits, keeping internal
+  "." "-" "/" so identifiers survive as one token ("id.am-01", "1.6",
+  "116-283"). Each such compound also contributes its parts ("id", "am", "01")
+  so partial matches still score. Surrounding punctuation is dropped — with a
+  plain whitespace split, "ID.AM-01:" in a document and "ID.AM-01?" in a query
+  were different tokens and never matched.
 """
 
 import pickle
+import re
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -26,8 +31,25 @@ from rank_bm25 import BM25Okapi
 
 import config
 
+_TOKEN_RE = re.compile(r"\w+(?:[.\-/]\w+)*")
+_SEPARATOR_RE = re.compile(r"[.\-/]")
+
+
+def tokenize(text: str) -> List[str]:
+    tokens = []
+    for token in _TOKEN_RE.findall(text.lower()):
+        tokens.append(token)
+        parts = _SEPARATOR_RE.split(token)
+        if len(parts) > 1:
+            tokens.extend(parts)
+    return tokens
+
 
 class BM25Index:
+    # Stored with the pickled index; an index built with a different tokenizer
+    # is treated as missing so it gets rebuilt rather than silently mismatched.
+    TOKENIZER_VERSION = "regex-v1"
+
     def __init__(self):
         self._bm25: BM25Okapi | None = None
         # Each entry: {"id": str, "document": str, "metadata": dict}
@@ -43,7 +65,7 @@ class BM25Index:
             docs: list of {"id": ..., "document": ..., "metadata": ...}
         """
         self._docs = docs
-        tokenized = [doc["document"].lower().split() for doc in docs]
+        tokenized = [tokenize(doc["document"]) for doc in docs]
         self._bm25 = BM25Okapi(tokenized)
         print(f"[bm25] Index built from {len(docs)} documents")
 
@@ -59,7 +81,7 @@ class BM25Index:
         if self._bm25 is None:
             raise RuntimeError("BM25 index not built. Call build() or load() first.")
 
-        tokens = query.lower().split()
+        tokens = tokenize(query)
         scores: np.ndarray = self._bm25.get_scores(tokens)
 
         # Get indices of top_k highest scores
@@ -84,15 +106,23 @@ class BM25Index:
     def save(self, path: Path = config.BM25_INDEX_PATH):
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as f:
-            pickle.dump({"bm25": self._bm25, "docs": self._docs}, f)
+            pickle.dump(
+                {"bm25": self._bm25, "docs": self._docs, "tokenizer": self.TOKENIZER_VERSION}, f
+            )
         print(f"[bm25] Index saved to {path}")
 
     def load(self, path: Path = config.BM25_INDEX_PATH) -> bool:
-        """Load index from disk. Returns True if successful, False if file missing."""
+        """
+        Load index from disk. Returns False if the file is missing or was built
+        with a different tokenizer (the caller then rebuilds it).
+        """
         if not path.exists():
             return False
         with open(path, "rb") as f:
             data = pickle.load(f)
+        if data.get("tokenizer") != self.TOKENIZER_VERSION:
+            print("[bm25] Saved index uses an older tokenizer — it will be rebuilt")
+            return False
         self._bm25 = data["bm25"]
         self._docs = data["docs"]
         print(f"[bm25] Index loaded — {len(self._docs)} documents")
