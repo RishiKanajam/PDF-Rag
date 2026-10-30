@@ -1,0 +1,662 @@
+item,id,mode,type,question,gold_answer,context,answer,judge_faithfulness,judge_answer_relevance,judge_correctness,human_faithfulness,human_answer_relevance,human_correctness,notes
+1,q30,hybrid,paraphrase,Can protecting people's privacy make an AI model less accurate?,"Yes. Under certain conditions such as data sparsity, privacy-enhancing techniques can result in a loss in accuracy, which can affect decisions about fairness.","Privacy-related risks may influence
+security, bias, and transparency and come with tradeoffs with these other characteristics. Like safety and security, specific technical features of an AI system may promote or reduce
+privacy. AI systems can also present new risks to privacy by allowing inference to identify
+individuals or previously private information about individuals. Privacy-enhancing technologies (“PETs”) for AI, as well as data minimizing methods such
+as de-identification and aggregation for certain model outputs, can support design for
+privacy-enhanced AI systems. Under certain conditions such as data sparsity, privacy-
+enhancing techniques can result in a loss in accuracy, affecting decisions about fairness
+and other values in certain domains. 3.7 Fair – with Harmful Bias Managed
+Fairness in AI includes concerns for equality and equity by addressing issues such as harm-
+ful bias and discrimination.
+
+---
+
+Addressing AI trustworthiness characteristics individually will not ensure AI system trust-
+worthiness; tradeoffs are usually involved, rarely do all characteristics apply in every set-
+ting, and some will be more or less important in any given situation. Ultimately, trustwor-
+thiness is a social concept that ranges across a spectrum and is only as strong as its weakest
+characteristics. When managing AI risks, organizations can face difficult decisions in balancing these char-
+acteristics. For example, in certain scenarios tradeoffs may emerge between optimizing for
+interpretability and achieving privacy. In other cases, organizations might face a tradeoff
+between predictive accuracy and interpretability. Or, under certain conditions such as data
+sparsity, privacy-enhancing techniques can result in a loss in accuracy, affecting decisions
+Page 12
+
+---
+
+NIST AI 100-1 AI RMF 1.0
+ple, how a human operator or user is notified when a potential or actual adverse outcome
+caused by an AI system is detected. A transparent system is not necessarily an accurate,
+privacy-enhanced, secure, or fair system. However, it is difficult to determine whether an
+opaque system possesses such characteristics, and to do so over time as complex systems
+evolve. The role of AI actors should be considered when seeking accountability for the outcomes of
+AI systems. The relationship between risk and accountability associated with AI and tech-
+nological systems more broadly differs across cultural, legal, sectoral, and societal contexts. When consequences are severe, such as when life and liberty are at stake, AI developers
+and deployers should consider proportionally and proactively adjusting their transparency
+and accountability practices.","Yes. The context notes that privacy‑enhancing techniques—such as de‑identification, aggregation, or other data‑minimizing methods—can lead to a loss in accuracy, especially in situations with data sparsity. This trade‑off can affect decisions about fairness and other values in certain domains.",1.0,1.0,1.0,,,,
+2,q15,dense,single_fact,"According to CSF 2.0, when should actions supporting RESPOND and RECOVER happen?",They should be ready at all times and happen when cybersecurity incidents occur.,"• RESPOND (RS) — Actions regarding a detected cybersecurity incident are taken. RESPOND 
+supports the ability to contain the effects of cybersecurity incidents. Outcomes within 
+this Function cover incident management, analysis, mitigation, reporting, and 
+communication. • RECOVER (RC) — Assets and operations affected by a cybersecurity incident are restored. RECOVER supports the timely restoration of normal operations to reduce the effects of 
+cybersecurity incidents and enable appropriate communication during recovery efforts. Figure 2 shows the CSF Functions as a wheel because all of the Functions relate to one another. For example, an organization will categorize assets under IDENTIFY and take steps to secure 
+those assets under PROTECT.
+
+---
+
+NIST CSWP 29  The NIST Cybersecurity Framework (CSF) 2.0 
+February 26, 2024 
+ 
+  23 
+o RC.RP-02: Recovery actions are selected, scoped, prioritized, and performed 
+o RC.RP-03: The integrity of backups and other restoration assets is verified before using 
+them for restoration 
+o RC.RP-04: Critical mission functions and cybersecurity risk management are considered 
+to establish post-incident operational norms 
+o RC.RP-05: The integrity of restored assets is verified, systems and services are restored, 
+and normal operating status is confirmed 
+o RC.RP-06: The end of incident recovery is declared based on criteria, and incident-
+related documentation is completed 
+• Inc ident Recovery Communication (RC.CO):  Restoration activities are coordinated with 
+internal and external parties 
+o R C.CO -03: Recovery activities and progress in restoring operational capabilities are 
+communicated to designated internal and external stakeholders 
+o RC.CO-04: Public updates on incident recovery are shared using approved methods and 
+messaging
+
+---
+
+The CSF 2.0 Core is also available in a 
+legacy format s imilar to that of CSF 1.1. Function Category Category Identifier 
+Govern (GV) Organizational Context GV.OC 
+ Risk Management Strategy GV.RM 
+ Roles, Responsibilities, and Authorities GV.RR 
+ Policy GV.PO 
+ Oversight GV.OV 
+ Cybersecurity Supply Chain Risk Management GV.SC 
+Identify (ID) Asset Management ID.AM 
+ Risk Assessment ID.RA 
+ Improvement ID.IM 
+Protect (PR) Identity Management, Authentication, and Access Control PR.AA 
+ Awareness and Training PR.AT 
+ Data Security PR.DS 
+ Platform Security PR.PS 
+ Technology Infrastructure Resilience PR.IR 
+Detect (DE) Continuous Monitoring  DE.CM  
+ Adverse Event Analysis  DE.AE  
+Respond (RS) Incident Management RS.MA 
+ Incident Analysis RS.AN 
+ Incident Response Reporting and Communication RS.CO 
+ Incident Mitigation RS.MI 
+Recover (RC) Incident Recovery Plan Execution RC.RP 
+ Incident Recovery Communication RC.CO","According to the NIST Cybersecurity Framework 2.0, actions that support **RESPOND** are taken **when a cybersecurity incident is detected**—i.e., during the incident‑management phase to contain and mitigate the event.  
+Actions that support **RECOVER** are performed **after the incident has been contained**, during the restoration phase to restore affected assets and operations to normal status.",0.5,1.0,0.5,,,,
+3,q04,dense,single_fact,What is residual risk according to the AI RMF?,Risk remaining after risk treatment.,"These frameworks have some
+features in common with the AI RMF. Like most risk management approaches, they are
+outcome-based rather than prescriptive and are often structured around a Core set of func-
+tions, categories, and subcategories. While there are significant differences between these
+frameworks based on the domain addressed – and because AI risk management calls for
+addressing many other types of risks – frameworks like those mentioned above may inform
+security and privacy considerations in the MAP, MEASURE , and MANAGE functions of the
+AI RMF. At the same time, guidance available before publication of this AI RMF does not compre-
+hensively address many AI system risks.
+
+---
+
+While there are significant differences between these
+frameworks based on the domain addressed – and because AI risk management calls for
+addressing many other types of risks – frameworks like those mentioned above may inform
+security and privacy considerations in the MAP, MEASURE , and MANAGE functions of the
+AI RMF. At the same time, guidance available before publication of this AI RMF does not compre-
+hensively address many AI system risks.
+
+---
+
+NIST AI 100-1 AI RMF 1.0
+Part 1: Foundational Information
+1. Framing Risk
+AI risk management offers a path to minimize potential negative impacts of AI systems,
+such as threats to civil liberties and rights, while also providing opportunities to maximize
+positive impacts. Addressing, documenting, and managing AI risks and potential negative
+impacts effectively can lead to more trustworthy AI systems. 1.1 Understanding and Addressing Risks, Impacts, and Harms
+In the context of the AI RMF,risk refers to the composite measure of an event’s probability
+of occurring and the magnitude or degree of the consequences of the corresponding event. The impacts, or consequences, of AI systems can be positive, negative, or both and can
+result in opportunities or threats (Adapted from: ISO 31000:2018).",I don't have enough information to answer that.,1.0,0.0,0.0,,,,
+4,q16,hybrid_rerank,exact_term,What does AI RMF subcategory GOVERN 1.6 require?,Mechanisms are in place to inventory AI systems and are resourced according to organizational risk priorities.,"NIST AI 100-1 AI RMF 1.0
+Table 1: Categories and subcategories for the GOVERN function. (Continued)
+GOVERN 1.5: Ongoing monitoring and periodic review of the
+risk management process and its outcomes are planned and or-
+ganizational roles and responsibilities clearly defined, including
+determining the frequency of periodic review. GOVERN 1.6: Mechanisms are in place to inventory AI systems
+and are resourced according to organizational risk priorities. GOVERN 1.7: Processes and procedures are in place for decom-
+missioning and phasing out AI systems safely and in a man-
+ner that does not increase risks or decrease the organization’s
+trustworthiness. GOVERN 2:
+Accountability
+structures are in
+place so that the
+appropriate teams
+and individuals are
+empowered,
+responsible, and
+trained for mapping,
+measuring, and
+managing AI risks.
+
+---
+
+MANAGE 4.3: Incidents and errors are communicated to relevant
+AI actors, including affected communities. Processes for track-
+ing, responding to, and recovering from incidents and errors are
+followed and documented. Categories Subcategories
+6. AI RMF Profiles
+AI RMF use-case profiles are implementations of the AI RMF functions, categories, and
+subcategories for a specific setting or application based on the requirements, risk tolerance,
+and resources of the Framework user: for example, an AI RMF hiring profile or an AI
+RMF fair housing profile. Profiles may illustrate and offer insights into how risk can be
+managed at various stages of the AI lifecycle or in specific sector, technology, or end-use
+applications. AI RMF profiles assist organizations in deciding how they might best manage
+AI risk that is well-aligned with their goals, considers legal/regulatory requirements and
+best practices, and reflects risk management priorities.
+
+---
+
+NIST AI 100-1 AI RMF 1.0
+Part 2: Core and Profiles
+5. AI RMF Core
+The AI RMF Core provides outcomes and actions that enable dialogue, understanding, and
+activities to manage AI risks and responsibly develop trustworthy AI systems. As illus-
+trated in Figure 5, the Core is composed of four functions: GOVERN , MAP, MEASURE ,
+and MANAGE . Each of these high-level functions is broken down into categories and sub-
+categories. Categories and subcategories are subdivided into specific actions and outcomes. Actions do not constitute a checklist, nor are they necessarily an ordered set of steps. Fig. 5. Functions organize AI risk management activities at their highest level to govern, map,
+measure, and manage AI risks. Governance is designed to be a cross-cutting function to inform
+and be infused throughout the other three functions. Risk management should be continuous, timely, and performed throughout the AI system
+lifecycle dimensions.",GOVERN 1.6 requires that mechanisms be in place to inventory AI systems and that those mechanisms be resourced in accordance with the organization’s risk priorities.,1.0,1.0,1.0,,,,
+5,q36,dense,unanswerable,How much funding did Congress allocate to NIST to develop the AI RMF?,Not answerable from the documents.,"Development of the AI RMF by NIST in collaboration with the private and public sec-
+tors is directed and consistent with its broader AI efforts called for by the National AI
+Initiative Act of 2020, the National Security Commission on Artificial Intelligence recom-
+mendations, and the Plan for Federal Engagement in Developing Technical Standards and
+Related Tools. Engagement with the AI community during this Framework’s development
+– via responses to a formal Request for Information, three widely attended workshops,
+public comments on a concept paper and two drafts of the Framework, discussions at mul-
+tiple public forums, and many small group meetings – has informed development of the AI
+RMF 1.0 as well as AI research and development and evaluation conducted by NIST and
+others. Priority research and additional guidance that will enhance this Framework will be
+captured in an associated AI Risk Management Framework Roadmap to which NIST and
+the broader community can contribute. Page 3
+
+---
+
+NIST intends to work collaboratively with others to develop met-
+rics, methodologies, and goals for evaluating the AI RMF’s effectiveness, and to broadly
+share results and supporting information.
+
+---
+
+Organizations and other users of the Framework are encouraged to periodically evaluate
+whether the AI RMF has improved their ability to manage AI risks, including but not lim-
+ited to their policies, processes, practices, implementation plans, indicators, measurements,
+and expected outcomes. NIST intends to work collaboratively with others to develop met-
+rics, methodologies, and goals for evaluating the AI RMF’s effectiveness, and to broadly
+share results and supporting information.",I don't have enough information to answer that.,1.0,1.0,1.0,,,,
+6,q32,dense,paraphrase,How can a company communicate the security standard it expects its vendors to meet?,"A Target Profile can express the organization's cybersecurity risk management requirements and expectations to suppliers, partners, and other third parties as a target for them to achieve.","• Suppl y chain risk s: An organization can use the CSF to foster cybersecurity risk oversight 
+and communications with stakeholders across supply chains. All types of technology rely 
+on a complex, globally distributed, extensive, and interconnected supply chain 
+ecosystem with geographically diverse routes and multiple levels of outsourcing. This 
+ecosystem is composed of public- and private-sector entities (e.g., acquirers, suppliers, 
+developers, system integrators, external system service providers, and other 
+technology-related service providers) that interact to research, develop, design, 
+manufacture, acquire, deliver, integrate, operate, maintain, dispose of, and otherwise 
+utilize or manage technology products and services. These interactions are shaped and 
+influenced by technologies, laws, policies, procedures, and practices. Given the complex and interconnected relationships in this ecosystem, supply chain risk 
+management (SCRM) is critical for organizations.
+
+---
+
+NIST CSWP 29  The NIST Cybersecurity Framework (CSF) 2.0 
+February 26, 2024 
+ 
+  18 
+o GV.SC-05: Requirements to address cybersecurity risks in supply chains are established, 
+prioritized, and integrated into contracts and other types of agreements with suppliers 
+and other relevant third parties 
+o GV.SC-06: Planning and due diligence are performed to reduce risks before entering into 
+formal supplier or other third-party relationships 
+o GV.SC-07: The risks posed by a supplier, their products and services, and other third 
+parties are understood, recorded, prioritized, assessed, responded to, and monitored 
+over the course of the relationship 
+o GV.SC-08: Relevant suppliers and other third parties are included in incident planning, 
+response, and recovery activities 
+o GV.SC-09: Supply chain security practices are integrated into cybersecurity and 
+enterprise risk management programs, and their performance is monitored throughout 
+the technology product and service life cycle 
+o GV.SC-10: Cybersecurity supply chain risk management plans include provisions for 
+activities that occur after the conclusion of a partnership or service agreement 
+ 
+IDENTIFY (ID): The organization’s current cybersecurity risks are understood 
+• Asset Management (ID.AM): Assets (e.g., data, hardware, software, systems, facilities, 
+services, people) that enable the organization to achieve business purposes are identified 
+and managed consistent with their relative importance to organizational objectives and the 
+organization’s risk strategy 
+o ID.AM-01: Inventories of hardware managed by the organization are maintained 
+o ID.AM-02: Inventories of software, services, and systems managed by the organization 
+are maintained 
+o ID.AM-03: Representations of the organization’s authorized network communication 
+and internal and external network data flows are maintained 
+o ID.AM-04: Inventories of services provided by suppliers are maintained 
+o ID.AM-05: Assets are prioritized based on classification, criticality, resources, and 
+impact on the mission 
+o ID.AM-07: Inventories of data and corresponding metadata for designated data types 
+are maintained 
+o ID.AM-08: Systems, hardware, software, services, and data are managed throughout 
+their life cycles 
+• Ri sk Assessment (ID.RA): The cybersecurity risk to the organization, assets, and individuals 
+is understood by the organization 
+o ID .RA -01: Vulnerabilities in assets are identified, validated, and recorded
+
+---
+
+There is an awareness of cybersecurity risks at the 
+organizational level, but an organization-wide approach 
+to managing cybersecurity risks has not been 
+established. Consideration of cybersecurity in organizational 
+objectives and programs may occur at some but not all 
+levels of the organization. Cyber risk assessment of 
+organizational and external assets occurs but is not 
+typically repeatable or reoccurring. Cybersecurity information is shared within the 
+organization on an informal basis. The organization is aware of the cybersecurity risks 
+associated with its suppliers and the products and 
+services it acquires and uses, but it does not act 
+consistently or formally in response to those risks. Tier 3: 
+Repeatable  
+The organization’s risk management 
+practices are formally approved and 
+expressed as policy. Risk-informed policies, processes, and 
+procedures are defined, implemented 
+as intended, and reviewed.","A company can communicate the security standard it expects its vendors to meet by embedding those requirements into its contractual and procurement processes. Specifically, it should:
+
+1. **Establish and Prioritize Requirements (GV.SC‑05)** – Define the cybersecurity expectations for suppliers and other third parties, rank them by importance, and incorporate them into contracts or other agreements.
+
+2. **Plan and Conduct Due Diligence (GV.SC‑06)** – Before entering a formal relationship, perform risk‑based assessments and due‑diligence checks to ensure the vendor can meet the defined standards.
+
+3. **Document and Monitor Vendor Risks (GV.SC‑07)** – Record, prioritize, assess, respond to, and continuously monitor the risks posed by each supplier, their products, and services throughout the relationship.
+
+4. **Include Vendors in Incident Planning (GV.SC‑08)** – Make sure relevant suppliers are part of incident response and recovery plans, so they understand their responsibilities during a security event.
+
+5. **Integrate Supply‑Chain Practices (GV.SC‑09)** – Embed supply‑chain security into the organization’s broader cybersecurity and enterprise risk‑management programs, and track performance over the entire product/service lifecycle.
+
+6. **Plan for Post‑Partnership Activities (GV.SC‑10)** – Include provisions in the supply‑chain risk‑management plan for actions that must occur after a partnership ends, ensuring ongoing compliance and data protection.
+
+By formally incorporating these elements into contracts, policies, and risk‑management processes, the company clearly communicates the security standards its vendors must meet.",1.0,1.0,0.0,,,,
+7,q29,dense,paraphrase,Why might a company that deploys someone else's pre-trained model see the dangers differently from the company that built it?,Different AI actors have different risk perspectives; deployers may not recognize that their particular uses entail risks that differ from those perceived by the initial developer.,"Risk at different stages of the AI lifecycle: Measuring risk at an earlier stage in the AI
+lifecycle may yield different results than measuring risk at a later stage; some risks may
+be latent at a given point in time and may increase as AI systems adapt and evolve. Fur-
+thermore, different AI actors across the AI lifecycle can have different risk perspectives. For example, an AI developer who makes AI software available, such as pre-trained mod-
+els, can have a different risk perspective than an AI actor who is responsible for deploying
+that pre-trained model in a specific use case. Such deployers may not recognize that their
+particular uses could entail risks which differ from those perceived by the initial developer. All involved AI actors share responsibilities for designing, developing, and deploying a
+trustworthy AI system that is fit for purpose.
+
+---
+
+Such deployers may not recognize that their
+particular uses could entail risks which differ from those perceived by the initial developer. All involved AI actors share responsibilities for designing, developing, and deploying a
+trustworthy AI system that is fit for purpose. Risk in real-world settings: While measuring AI risks in a laboratory or a controlled
+environment may yield important insights pre-deployment, these measurements may differ
+from risks that emerge in operational, real-world settings. Inscrutability: Inscrutable AI systems can complicate risk measurement. Inscrutability
+can be a result of the opaque nature of AI systems (limited explainability or interpretabil-
+ity), lack of transparency or documentation in AI system development or deployment, or
+inherent uncertainties in AI systems. Human baseline: Risk management of AI systems that are intended to augment or replace
+human activity, for example decision making, requires some form of baseline metrics for
+comparison.
+
+---
+
+For example, pre-trained
+models and transfer learning can advance research and increase accuracy and resilience
+when compared to other models and approaches. Identifying contextual factors in theMAP
+function will assist AI actors in determining the level of risk and potential management
+efforts. Compared to traditional software, AI-specific risks that are new or increased include the
+following:
+• The data used for building an AI system may not be a true or appropriate representa-
+tion of the context or intended use of the AI system, and the ground truth may either
+not exist or not be available. Additionally, harmful bias and other data quality issues
+can affect AI system trustworthiness, which could lead to negative impacts. • AI system dependency and reliance on data for training tasks, combined with in-
+creased volume and complexity typically associated with such data. • Intentional or unintentional changes during training may fundamentally alter AI sys-
+tem performance.","A company that deploys a pre‑trained model may not see the same dangers as the original developer because the risks can change once the model is applied to a specific use case. The developer’s risk perspective is based on the model’s design, training data, and intended general use, whereas the deployer’s perspective is shaped by the particular context, data, and operational environment in which the model is used. As a result, the deployer may encounter new or amplified risks—such as contextual mismatch, data quality issues, or unintended performance changes—that the original developer did not anticipate. All AI actors, however, share responsibility for ensuring the system is trustworthy and fit for its intended purpose.",1.0,1.0,1.0,,,,
+8,q18,dense,exact_term,What does MAP 1.5 state?,Organizational risk tolerances are determined and documented.,"MAP 4.2: Internal risk controls for components of the AI sys-
+tem, including third-party AI technologies, are identified and
+documented. MAP 5: Impacts to
+individuals, groups,
+communities,
+organizations, and
+society are
+characterized. MAP 5.1: Likelihood and magnitude of each identified impact
+(both potentially beneficial and harmful) based on expected use,
+past uses of AI systems in similar contexts, public incident re-
+ports, feedback from those external to the team that developed
+or deployed the AI system, or other data are identified and
+documented. Categories Subcategories
+Continued on next page
+Page 27
+
+---
+
+MAP 3.5: Processes for human oversight are defined, assessed,
+and documented in accordance with organizational policies from
+the GOVERN function. MAP 4: Risks and
+benefits are mapped
+for all components
+of the AI system
+including third-party
+software and data. MAP 4.1: Approaches for mapping AI technology and legal risks
+of its components – including the use of third-party data or soft-
+ware – are in place, followed, and documented, as are risks of in-
+fringement of a third party’s intellectual property or other rights. MAP 4.2: Internal risk controls for components of the AI sys-
+tem, including third-party AI technologies, are identified and
+documented. MAP 5: Impacts to
+individuals, groups,
+communities,
+organizations, and
+society are
+characterized.
+
+---
+
+The MAP function suggests opportunities to define and document processes for operator
+and practitioner proficiency with AI system performance and trustworthiness concepts, and
+to define relevant technical standards and certifications. Implementing MAP function cat-
+egories and subcategories may help organizations improve their internal competency for
+analyzing context, identifying procedural and system limitations, exploring and examining
+impacts of AI-based systems in the real world, and evaluating decision-making processes
+throughout the AI lifecycle. The GOVERN and MAP functions describe the importance of interdisciplinarity and demo-
+graphically diverse teams and utilizing feedback from potentially impacted individuals and
+communities. AI actors called out in the AI RMF who perform human factors tasks and
+activities can assist technical teams by anchoring in design and development practices to
+user intentions and representatives of the broader AI community, and societal values.",I don't have enough information to answer that.,1.0,0.0,0.0,,,,
+9,q14,dense,single_fact,"Under CSF Tier 1 (Partial), how is the organizational cybersecurity risk strategy applied?",In an ad hoc manner; prioritization is ad hoc and not formally based on objectives or the threat environment.,"CSF Target Profile 
+A part of an Organizational Profile that specifies the desired Core outcomes that an organization has selected and 
+prioritized for achieving its cybersecurity risk management objectives. CSF Tier 
+A characterization of the rigor of an organization’s cybersecurity risk governance and management practices . There are four Tiers: Partial (Tier 1), Risk Informed (Tier 2), Repeatable (Tier 3), and Adaptive (Tier 4).
+
+---
+
+NIST CSWP 29  The NIST Cybersecurity Framework (CSF) 2.0 
+February 26, 2024 
+ 
+  24 
+Appendix B. CSF Tiers 
+Table 2 contains a notional illustration of the CSF Tiers discussed in Sec. 3. The Tiers 
+characterize the rigor of an organization’s cybersecurity risk governance practices (GOVERN) and 
+cybersecurity risk management practices (IDENTIFY, PROTECT, DETECT, RESPOND, and RECOVER). Table 2. Notional Illustration of the CSF Tiers 
+Tier Cybersecurity Risk Governance Cybersecurity Risk Management 
+Tier 1: 
+Partial  
+Application of the organizational 
+cybersecurity risk strategy is managed 
+in an ad hoc manner. Prioritization is ad hoc and not 
+formally based on objectives or threat 
+environment. There is limited awareness of cybersecurity risks at the 
+organizational level. The organization implements cybersecurity risk 
+management on an irregular, case-by-case basis. The organization may not have processes that enable 
+cybersecurity information to be shared within the 
+organization.
+
+---
+
+These outcomes can be understood by a broad audience, including 
+executives, managers, and practitioners, regardless of their cybersecurity expertise. Because the outcomes are sector-, country-, and technology-neutral, they provide an 
+organization with the flexibility needed to address its unique risks, technologies, and 
+mission considerations. • CSF Organizational Profiles, which are a mechanism for describing an organization’s 
+current and/or target cybersecurity posture in terms of the CSF Core’s outcomes. • CSF Tiers, which can be applied to CSF Organizational Profiles to characterize the rigor of 
+an organization’s cybersecurity risk governance and management practices. Tiers can 
+also provide context for how an organization views cybersecurity risks and the processes 
+in place to manage those risks. This document describes what desirable outcomes an organization can aspire to achieve. It 
+does not prescribe outcomes nor how they may be achieved.","Under CSF Tier 1 (Partial), the organizational cybersecurity risk strategy is applied in an **ad hoc manner**.",1.0,1.0,1.0,,,,
+10,q35,hybrid,paraphrase,When does it make sense for an organization to move to a more rigorous level of cybersecurity practice?,Progression to higher Tiers is encouraged when risks or mandates are greater or when a cost-benefit analysis indicates a feasible and cost-effective reduction of negative cybersecurity risks.,"These outcomes can be understood by a broad audience, including 
+executives, managers, and practitioners, regardless of their cybersecurity expertise. Because the outcomes are sector-, country-, and technology-neutral, they provide an 
+organization with the flexibility needed to address its unique risks, technologies, and 
+mission considerations. • CSF Organizational Profiles, which are a mechanism for describing an organization’s 
+current and/or target cybersecurity posture in terms of the CSF Core’s outcomes. • CSF Tiers, which can be applied to CSF Organizational Profiles to characterize the rigor of 
+an organization’s cybersecurity risk governance and management practices. Tiers can 
+also provide context for how an organization views cybersecurity risks and the processes 
+in place to manage those risks. This document describes what desirable outcomes an organization can aspire to achieve. It 
+does not prescribe outcomes nor how they may be achieved.
+
+---
+
+3.5 Explainable and Interpretable
+Explainability refers to a representation of the mechanisms underlying AI systems’ oper-
+ation, whereas interpretability refers to the meaning of AI systems’ output in the context
+of their designed functional purposes. Together, explainability and interpretability assist
+those operating or overseeing an AI system, as well as users of an AI system, to gain
+deeper insights into the functionality and trustworthiness of the system, including its out-
+puts. The underlying assumption is that perceptions of negative risk stem from a lack of
+ability to make sense of, or contextualize, system output appropriately. Explainable and
+interpretable AI systems offer information that will help end users understand the purposes
+and potential impact of an AI system. Risk from lack of explainability may be managed by describing how AI systems function,
+with descriptions tailored to individual differences such as the user’s role, knowledge, and
+skill level.
+
+---
+
+Tier 4: 
+Adaptive  
+There is an organization-wide 
+approach to managing cybersecurity 
+risks that uses risk-informed policies, 
+processes, and procedures to address 
+potential cybersecurity events. The 
+relationship between cybersecurity 
+risks and organizational objectives is 
+clearly understood and considered 
+when making decisions. Executives 
+monitor cybersecurity risks in the 
+same context as financial and other 
+organizational risks. The organizational 
+budget is based on an understanding 
+of the current and predicted risk 
+environment and risk tolerance. Business units implement executive 
+vision and analyze system-level risks in 
+the context of the organizational risk 
+tolerances. Cybersecurity risk management is part 
+of the organizational culture. It 
+evolves from an awareness of previous 
+activities and continuous awareness of 
+activities on organizational systems 
+and networks.","It makes sense for an organization to move to a more rigorous level of cybersecurity practice when it wants to elevate the rigor of its risk‑governance and management processes so that cybersecurity is fully integrated into its overall risk‑management framework. In practice this means:
+
+* **Adopting a risk‑informed, organization‑wide approach** – policies, processes, and procedures that explicitly address potential cybersecurity events and link those risks to business objectives.  
+* **Aligning executive oversight** – executives monitor cybersecurity risks in the same context as financial and other organizational risks, and the budget is set based on an understanding of the current and predicted risk environment and the organization’s risk tolerance.  
+* **Embedding risk management in culture** – cybersecurity risk management becomes part of the organizational culture, evolving from continuous awareness of activities on systems and networks.  
+* **Enabling business units to act on executive vision** – business units analyze system‑level risks within the context of the organization’s risk tolerances and implement the executive vision accordingly.  
+
+When an organization reaches this level of maturity—characterized by the Tier 4 “Adaptive” profile in the CSF—it has demonstrated that it can manage cybersecurity risks with the same rigor and integration as other critical business risks, making it appropriate to adopt a more rigorous cybersecurity practice.",1.0,0.5,0.5,,,,
+11,q02,hybrid,single_fact,Which law directed NIST to develop the AI Risk Management Framework?,The National Artificial Intelligence Initiative Act of 2020 (P.L. 116-283).,"Take advantage of and foster greater awareness of existing standards, guidelines, best
+practices, methodologies, and tools for managing AI risks – as well as illustrate the
+need for additional, improved resources. 9. Be law- and regulation-agnostic. The Framework should support organizations’
+abilities to operate under applicable domestic and international legal or regulatory
+regimes. 10. Be a living document. The AI RMF should be readily updated as technology, under-
+standing, and approaches to AI trustworthiness and uses of AI change and as stake-
+holders learn from implementing AI risk management generally and this framework
+in particular. Page 42
+
+---
+
+While GOVERN applies to all stages of organizations’ AI risk management pro-
+cesses and procedures, the MAP, MEASURE , and MANAGE functions can be applied in AI
+system-specific contexts and at specific stages of the AI lifecycle. Additional resources related to the Framework are included in the AI RMF Playbook,
+which is available via the NIST AI RMF website:
+https://www.nist.gov/itl/ai-risk-management-framework. Development of the AI RMF by NIST in collaboration with the private and public sec-
+tors is directed and consistent with its broader AI efforts called for by the National AI
+Initiative Act of 2020, the National Security Commission on Artificial Intelligence recom-
+mendations, and the Plan for Federal Engagement in Developing Technical Standards and
+Related Tools.
+
+---
+
+Use of the
+Framework should be intuitive and readily adaptable as part of an organization’s
+broader risk management strategy and processes. It should be consistent or aligned
+with other approaches to managing AI risks. 6. Be useful to a wide range of perspectives, sectors, and technology domains. The AI
+RMF should be universally applicable to any AI technology and to context-specific
+use cases. 7. Be outcome-focused and non-prescriptive. The Framework should provide a catalog
+of outcomes and approaches rather than prescribe one-size-fits-all requirements. 8. Take advantage of and foster greater awareness of existing standards, guidelines, best
+practices, methodologies, and tools for managing AI risks – as well as illustrate the
+need for additional, improved resources. 9. Be law- and regulation-agnostic. The Framework should support organizations’
+abilities to operate under applicable domestic and international legal or regulatory
+regimes. 10. Be a living document.",The National AI Initiative Act of 2020 directed NIST to develop the AI Risk Management Framework.,1.0,1.0,1.0,,,,
+12,q12,dense,single_fact,What is a CSF Community Profile?,"A baseline of CSF outcomes created and published to address shared interests and goals among a number of organizations, typically for a sector, subsector, technology, threat type or other use case.","A Community Profile is 
+typically developed for a particular sector, subsector, technology, threat type, or other use 
+case. An organization can use a Community Profile as the basis for its own Target Profile. Examples of Community Profiles can be found on the NIST CSF website. The
+ steps shown in Fig. 3 and summarized below illustrate one way that an organization could 
+use an Organizational Profile to help inform continuous improvement of its cybersecurity. Fig. 3. Steps for creating and using a CSF Organizational Profile
+
+---
+
+NIST CSWP 29  The NIST Cybersecurity Framework (CSF) 2.0 
+February 26, 2024 
+ 
+  26 
+Appendix C. Glossary 
+CSF Category 
+A group of related cybersecurity outcomes that collectively comprise a CSF Function. CSF Community Profile 
+A baseline of CSF outcomes that is created and published to address shared interests and goals among a number of 
+organizations. A Community Profile is typically developed for a particular sector, subsector, technology, threat 
+type, or other use case. An organization can use a Community Profile as the basis for its own Target Profile. CSF Core 
+A taxonomy of high-level cybersecurity outcomes that can help any organization manage its cybersecurity risk s. Its 
+components are a hierarchy of Functions, Categories, and Subcategories that detail each outcome.
+
+---
+
+Every Organizational Profile includes one or both of the following: 
+1. A Cur
+rent Profile specifies the Core outcomes that an organization is currently achieving 
+(or attempting to achieve) and characterizes how or to what extent each outcome is 
+being achieved. 2. A Target Profile specifies the desired outcomes that an organization has selected and 
+prioritized for achieving its cybersecurity risk management objectives. A Target Profile 
+considers anticipated changes to the organization’s cybersecurity posture, such as new 
+requirements, new technology adoption, and threat intelligence trends. A Community P rofile is a baseline of CSF outcomes that is created and published to address 
+shared interests and goals among a number of organizations. A Community Profile is 
+typically developed for a particular sector, subsector, technology, threat type, or other use 
+case. An organization can use a Community Profile as the basis for its own Target Profile.","A CSF Community Profile is a baseline of Cybersecurity Framework (CSF) outcomes that is created and published to address shared interests and goals among a number of organizations. It is typically developed for a particular sector, subsector, technology, threat type, or other use case, and an organization can use a Community Profile as the basis for its own Target Profile.",1.0,1.0,1.0,,,,
+13,q11,hybrid,single_fact,What does a CSF Target Profile specify?,The desired outcomes that an organization has selected and prioritized for achieving its cybersecurity risk management objectives.,"CSF Implementation Example 
+A concise, action-oriented, notional illustration of a way to help achieve a CSF Core outcome. CSF Informative Reference 
+A mapping that indicates a relationship between a CSF Core outcome and an existing standard, guideline, 
+regulation, or other content. CSF Organizational Profile 
+A mechanism for describing an organization’s current and/or target cybersecurity posture in terms of the CSF 
+Core’s outcomes. CSF Quick Start Guide 
+A supplementary resource that gives brief, actionable guidance on specific CSF-related topics. CSF Subcategory 
+A group of more specific outcomes of technical and management cybersecurity activities that comprise a CSF 
+Category. CSF Target Profile 
+A part of an Organizational Profile that specifies the desired Core outcomes that an organization has selected and 
+prioritized for achieving its cybersecurity risk management objectives.
+
+---
+
+CSF Target Profile 
+A part of an Organizational Profile that specifies the desired Core outcomes that an organization has selected and 
+prioritized for achieving its cybersecurity risk management objectives. CSF Tier 
+A characterization of the rigor of an organization’s cybersecurity risk governance and management practices . There are four Tiers: Partial (Tier 1), Risk Informed (Tier 2), Repeatable (Tier 3), and Adaptive (Tier 4).
+
+---
+
+NIST CSWP 29  The NIST Cybersecurity Framework (CSF) 2.0 
+February 26, 2024 
+  6 
+3. Introduction to CSF Profiles and Tiers 
+This section defines the concepts of CSF Profiles and Tiers. 3.1. CSF Profiles 
+A CSF Organizational Profile describes an organization’s current and/or target cybersecurity 
+posture in terms of the Core’s outcomes. Organizational Profiles are used to understand, tailor, 
+assess, prioritize, and communicate the Core’s outcomes by considering an organization’s 
+mission objectives, stakeholder expectations, threat landscape, and requirements. An 
+organization can then prioritize its actions to achieve specific outcomes and communicate that 
+information to stakeholders. Every Organizational Profile includes one or both of the following: 
+1. A Cur
+rent Profile specifies the Core outcomes that an organization is currently achieving 
+(or attempting to achieve) and characterizes how or to what extent each outcome is 
+being achieved. 2.",A CSF Target Profile specifies the desired Core outcomes that an organization has selected and prioritized for achieving its cybersecurity risk management objectives.,1.0,1.0,1.0,,,,
+14,q17,bm25,exact_term,What is MEASURE 2.12 about?,Environmental impact and sustainability of AI model training and management activities are assessed and documented.,"MEASURE 2.9: The AI model is explained, validated, and docu-
+mented, and AI system output is interpreted within its context –
+as identified in the MAP function – to inform responsible use and
+governance. MEASURE 2.10: Privacy risk of the AI system – as identified in
+the MAP function – is examined and documented. MEASURE 2.11: Fairness and bias – as identified in the MAP
+function – are evaluated and results are documented. MEASURE 2.12: Environmental impact and sustainability of AI
+model training and management activities – as identified in the
+MAP function – are assessed and documented. MEASURE 2.13: Effectiveness of the employed TEVV met-
+rics and processes in the MEASURE function are evaluated and
+documented. MEASURE 3:
+Mechanisms for
+tracking identified
+AI risks over time
+are in place.
+
+---
+
+See Figure 3
+for representative AI actors. 10
+Fig. 3 AI actors across AI lifecycle stages. See Appendix A for detailed descrip-
+tions of AI actor tasks, including details about testing, evaluation, verifica-
+tion, and validation tasks. Note that AI actors in the AI Model dimension
+(Figure 2) are separated as a best practice, with those building and using the
+models separated from those verifying and validating the models. 11
+Fig. 4 Characteristics of trustworthy AI systems. Valid & Reliable is a necessary
+condition of trustworthiness and is shown as the base for other trustworthi-
+ness characteristics. Accountable & Transparent is shown as a vertical box
+because it relates to all other characteristics. 12
+Fig. 5 Functions organize AI risk management activities at their highest level to
+govern, map, measure, and manage AI risks. Governance is designed to be
+a cross-cutting function to inform and be infused throughout the other three
+functions. 20
+Page ii
+
+---
+
+NIST AI 100-1 AI RMF 1.0
+Table 3: Categories and subcategories for the MEASURE function. (Continued)
+MEASURE 3.3: Feedback processes for end users and impacted
+communities to report problems and appeal system outcomes are
+established and integrated into AI system evaluation metrics. MEASURE 4:
+Feedback about
+efficacy of
+measurement is
+gathered and
+assessed. MEASURE 4.1: Measurement approaches for identifying AI risks
+are connected to deployment context(s) and informed through
+consultation with domain experts and other end users. Ap-
+proaches are documented. MEASURE 4.2: Measurement results regarding AI system trust-
+worthiness in deployment context(s) and across the AI lifecycle
+are informed by input from domain experts and relevant AI ac-
+tors to validate whether the system is performing consistently as
+intended. Results are documented.",MEASURE 2.12 is about assessing and documenting the environmental impact and sustainability of AI model training and management activities.,1.0,1.0,1.0,,,,
+15,q05,dense,single_fact,"Which trustworthiness characteristic does the AI RMF describe as a necessary condition of trustworthiness, shown as the base of the others?",Valid & Reliable.,"Valid & Reliable is a necessary condition of
+trustworthiness and is shown as the base for other trustworthiness characteristics. Accountable &
+Transparent is shown as a vertical box because it relates to all other characteristics. Trustworthiness characteristics (shown in Figure 4) are inextricably tied to social and orga-
+nizational behavior, the datasets used by AI systems, selection of AI models and algorithms
+and the decisions made by those who build them, and the interactions with the humans who
+provide insight from and oversight of such systems. Human judgment should be employed
+when deciding on the specific metrics related to AI trustworthiness characteristics and the
+precise threshold values for those metrics. Addressing AI trustworthiness characteristics individually will not ensure AI system trust-
+worthiness; tradeoffs are usually involved, rarely do all characteristics apply in every set-
+ting, and some will be more or less important in any given situation.
+
+---
+
+The Framework and supporting resources will be updated, expanded, and improved based
+on evolving technology, the standards landscape around the world, and AI community ex-
+perience and feedback. NIST will continue to align the AI RMF and related guidance with
+applicable international standards, guidelines, and practices. As the AI RMF is put into
+use, additional lessons will be learned to inform future updates and additional resources. The Framework is divided into two parts. Part 1 discusses how organizations can frame
+the risks related to AI and describes the intended audience. Next, AI risks and trustworthi-
+ness are analyzed, outlining the characteristics of trustworthy AI systems, which include
+Page 2
+
+---
+
+Creating trustworthy AI requires balancing each of these characteristics based
+on the AI system’s context of use. While all characteristics are socio-technical system at-
+tributes, accountability and transparency also relate to the processes and activities internal
+to an AI system and its external setting. Neglecting these characteristics can increase the
+probability and magnitude of negative consequences. Fig. 4. Characteristics of trustworthy AI systems. Valid & Reliable is a necessary condition of
+trustworthiness and is shown as the base for other trustworthiness characteristics. Accountable &
+Transparent is shown as a vertical box because it relates to all other characteristics.",Valid & Reliable.,1.0,1.0,1.0,,,,
