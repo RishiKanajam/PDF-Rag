@@ -5,6 +5,9 @@ Wraps a LangChain chat model so every response is cached in SQLite, keyed by
 (model, generation params, prompt). Reruns are free and return byte-identical
 answers, and a run interrupted by a rate limit resumes where it stopped.
 
+With offline=True a cache miss raises CacheMiss instead of calling the API,
+so results can be rebuilt from the cache without a key or any spend.
+
 The wrapper exposes the same .invoke(prompt) -> obj.content interface the
 pipeline uses, so it can be passed straight into RAGPipeline(llm=...).
 """
@@ -18,6 +21,10 @@ from pathlib import Path
 from typing import Any, Dict
 
 
+class CacheMiss(Exception):
+    pass
+
+
 @dataclass
 class CachedResponse:
     content: str
@@ -29,8 +36,10 @@ class CachedResponse:
 
 
 class CachedChatModel:
-    def __init__(self, model, model_name: str, params: Dict[str, Any], cache_path: Path):
+    def __init__(self, model, model_name: str, params: Dict[str, Any], cache_path: Path,
+                 offline: bool = False):
         self.model = model
+        self.offline = offline
         self.model_name = model_name
         self.params = params
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -56,6 +65,8 @@ class CachedChatModel:
             self.hits += 1
             self.last = CachedResponse(**json.loads(row[0]), cached=True, key=key)
             return self.last
+        if self.offline:
+            raise CacheMiss(key)
 
         start = time.perf_counter()
         response = self.model.invoke(prompt)

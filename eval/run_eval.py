@@ -6,6 +6,8 @@ Reproducible evaluation of the four retrieval modes on eval/questions.jsonl.
 Usage:
     python eval/run_eval.py --all              # everything below
     python eval/run_eval.py --retrieval-only   # retrieval metrics only; no LLM, no API key
+    python eval/run_eval.py --cached-only      # like --all, but only from eval/cache/:
+                                               # no API calls, uncached items skipped and counted
 
 What --all runs:
     1. Retrieval   — dense, bm25, hybrid, hybrid_rerank: Recall@3, Recall@5, MRR@10
@@ -194,12 +196,20 @@ def run_retrieval(pipeline, questions, modes) -> List[Dict[str, Any]]:
 
 # ── Generation ─────────────────────────────────────────────────────────────────
 
-def run_generation(pipeline, answer_llm, judge, questions, mode, k) -> List[Dict[str, Any]]:
+def run_generation(pipeline, answer_llm, judge, questions, mode, k, skipped=None) -> List[Dict[str, Any]]:
+    from eval.llm_cache import CacheMiss
+
     rows = []
     for i, q in enumerate(questions, 1):
         start = time.perf_counter()
-        with quiet():
-            result = pipeline.query(q["question"], top_k=k, mode=mode)
+        try:
+            with quiet():
+                result = pipeline.query(q["question"], top_k=k, mode=mode)
+        except CacheMiss:
+            if skipped is None:
+                raise
+            skipped[f"{mode}@k={k}"] = skipped.get(f"{mode}@k={k}", 0) + 1
+            continue
         wall = time.perf_counter() - start
 
         called_llm = result["usage"] is not None
@@ -208,7 +218,13 @@ def run_generation(pipeline, answer_llm, judge, questions, mode, k) -> List[Dict
         latency = wall + (llm.latency_s if llm and llm.cached else 0.0)
 
         context = "\n\n---\n\n".join(c["document"] for c in result["chunks"])
-        verdict = judge.score(q["question"], q["gold_answer"], context, result["answer"])
+        try:
+            verdict = judge.score(q["question"], q["gold_answer"], context, result["answer"])
+        except CacheMiss:
+            if skipped is None:
+                raise
+            skipped[f"{mode}@k={k}"] = skipped.get(f"{mode}@k={k}", 0) + 1
+            continue
 
         rows.append({
             "kind": "generation", "mode": mode, "k": k, "id": q["id"], "type": q["type"],
@@ -324,6 +340,12 @@ def write_markdown(path: Path, meta, retrieval_summary, generation_summary):
             f"- Groq system fingerprints — answer: {meta['fingerprints']['answer'] or '—'}; "
             f"judge: {meta['fingerprints']['judge'] or '—'}",
         ]
+    if meta.get("cached_only"):
+        skipped = {k: v for k, v in (meta.get("skipped_uncached") or {}).items() if v}
+        lines.append(
+            "- **Built from cache only (`--cached-only`), no API calls.** Items not yet cached were "
+            f"skipped: {skipped or 'none'}. Each table's `n` column gives the questions actually scored."
+        )
     lines += ["", f"## Retrieval ({meta['n_answerable']} answerable questions, no LLM)", "",
               "| Mode | Recall@3 | Recall@5 | MRR@10 | R@5 single-fact | R@5 exact-term | R@5 paraphrase | Latency p50 / p95 |",
               "|---|---|---|---|---|---|---|---|"]
@@ -336,13 +358,13 @@ def write_markdown(path: Path, meta, retrieval_summary, generation_summary):
         )
 
     def gen_table(rows):
-        out = ["| Mode | k | Faithfulness | Answer relevance | Context relevance | Correctness | "
+        out = ["| Mode | k | n | Faithfulness | Answer relevance | Context relevance | Correctness | "
                "Abstention (unanswerable) | False abstention (answerable) | Gold in context | "
                "Latency p50 / p95 | Tokens / q | Cost / q |",
-               "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+               "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
         for s in rows:
             out.append(
-                f"| {s['mode']} | {s['k']} | {_fmt(s['faithfulness'], digits=2)} | "
+                f"| {s['mode']} | {s['k']} | {s['n']} | {_fmt(s['faithfulness'], digits=2)} | "
                 f"{_fmt(s['answer_relevance'], digits=2)} | {_fmt(s['context_relevance'], digits=2)} | "
                 f"{_fmt(s['correctness'], digits=2)} | {s['abstention_correct']}/{s['abstention_n']} | "
                 f"{_fmt(s['false_abstention'], pct=True)} | {_fmt(s['gold_in_context'], pct=True)} | "
@@ -411,6 +433,8 @@ def parse_args():
     g = p.add_mutually_exclusive_group(required=True)
     g.add_argument("--all", action="store_true", help="retrieval + generation + ablation + human-check export")
     g.add_argument("--retrieval-only", action="store_true", help="retrieval metrics only (no API key needed)")
+    g.add_argument("--cached-only", action="store_true",
+                   help="like --all, but only from the cache: no API calls, uncached items skipped")
     p.add_argument("--label", default="", help="suffix for the results filename")
     p.add_argument("--judge-provider", default=config.JUDGE_PROVIDER)
     p.add_argument("--judge-model", default=config.JUDGE_MODEL)
@@ -420,9 +444,10 @@ def parse_args():
 
 def main() -> int:
     args = parse_args()
-    generation = args.all
+    generation = args.all or args.cached_only
+    offline = args.cached_only
 
-    if generation and not os.getenv("GROQ_API_KEY"):
+    if args.all and not os.getenv("GROQ_API_KEY"):
         print("ERROR: GROQ_API_KEY is not set. Generation and judging need it "
               "(export it, or put it in .env). Use --retrieval-only to run without it.")
         return 2
@@ -442,6 +467,7 @@ def main() -> int:
         from eval.llm_cache import CachedChatModel
 
         answer_llm = CachedChatModel(
+            None if offline else
             ChatGroq(api_key=os.environ["GROQ_API_KEY"], model_name=config.LLM_MODEL,
                      temperature=config.LLM_TEMPERATURE, max_tokens=config.LLM_MAX_TOKENS,
                      reasoning_effort=config.LLM_REASONING_EFFORT, max_retries=6),
@@ -449,8 +475,9 @@ def main() -> int:
             params={"temperature": config.LLM_TEMPERATURE, "max_tokens": config.LLM_MAX_TOKENS,
                     "reasoning_effort": config.LLM_REASONING_EFFORT},
             cache_path=CACHE_DIR / "llm_cache.sqlite",
+            offline=offline,
         )
-        judge = make_judge(args.judge_provider, args.judge_model, CACHE_DIR)
+        judge = make_judge(args.judge_provider, args.judge_model, CACHE_DIR, offline=offline)
 
     with quiet():
         pipeline = RAGPipeline(
@@ -464,11 +491,13 @@ def main() -> int:
     retrieval_rows = run_retrieval(pipeline, questions, MODES)
 
     generation_rows: List[Dict[str, Any]] = []
+    skipped: Dict[str, int] | None = {} if offline else None
     if generation:
         try:
             for mode in MODES:
-                generation_rows += run_generation(pipeline, answer_llm, judge, questions, mode, GENERATION_K)
-            generation_rows += run_generation(pipeline, answer_llm, judge, questions, *ABLATION)
+                generation_rows += run_generation(pipeline, answer_llm, judge, questions, mode,
+                                                  GENERATION_K, skipped)
+            generation_rows += run_generation(pipeline, answer_llm, judge, questions, *ABLATION, skipped)
         except Exception as e:
             print(f"\nERROR during generation: {type(e).__name__}: {e}\n"
                   "Every response so far is cached in eval/cache/; rerun the same command to resume.")
@@ -503,6 +532,8 @@ def main() -> int:
             "answer": sorted({r["answer_fingerprint"] for r in generation_rows if r["answer_fingerprint"]}),
             "judge": sorted({r["judge_fingerprint"] for r in generation_rows if r["judge_fingerprint"]}),
         },
+        "cached_only": offline,
+        "skipped_uncached": skipped,
         "seed": SEED, "prices_usd_per_m": PRICES_USD_PER_M if generation else None,
         "git": git_state(),
     }

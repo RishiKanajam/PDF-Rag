@@ -78,19 +78,20 @@ class Judge:
     provider: str = ""
     api_key_env: str = ""
 
-    def __init__(self, model: str, cache_dir: Path):
-        if not os.getenv(self.api_key_env):
+    def __init__(self, model: str, cache_dir: Path, offline: bool = False):
+        if not offline and not os.getenv(self.api_key_env):
             raise EnvironmentError(
                 f"{self.api_key_env} is not set — the {self.provider} judge needs it."
             )
         self.model = model
         self.prompt_template = load_judge_prompt()
         self.llm = CachedChatModel(
-            self._make_client(),
+            None if offline else self._make_client(),
             model_name=f"{self.provider}/{model}",
             params={"temperature": 0, "json": True, "max_tokens": config.JUDGE_MAX_TOKENS,
                     "reasoning_effort": config.JUDGE_REASONING_EFFORT},
             cache_path=cache_dir / "llm_cache.sqlite",
+            offline=offline,
         )
 
     def _make_client(self):
@@ -147,7 +148,7 @@ JUDGES = {
 }
 
 
-def make_judge(provider: str, model: str, cache_dir: Path) -> Judge:
+def make_judge(provider: str, model: str, cache_dir: Path, offline: bool = False) -> Judge:
     if provider not in JUDGES:
         raise ValueError(f"Unknown judge provider '{provider}'. Available: {sorted(JUDGES)}")
-    return JUDGES[provider](model=model, cache_dir=cache_dir)
+    return JUDGES[provider](model=model, cache_dir=cache_dir, offline=offline)

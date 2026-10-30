@@ -77,3 +77,16 @@ def test_missing_key_fails_loudly(monkeypatch, tmp_path):
         assert "FAKE_KEY" in str(e)
     else:
         raise AssertionError("expected EnvironmentError")
+
+
+def test_offline_cache_never_calls_the_model(tmp_path):
+    import pytest
+    from eval.llm_cache import CacheMiss, CachedChatModel
+
+    online = CachedChatModel(_FakeModel("hello"), "fake", {}, tmp_path / "c.sqlite")
+    online.invoke("cached prompt")
+
+    offline = CachedChatModel(None, "fake", {}, tmp_path / "c.sqlite", offline=True)
+    assert offline.invoke("cached prompt").content == "hello"
+    with pytest.raises(CacheMiss):
+        offline.invoke("never seen")
